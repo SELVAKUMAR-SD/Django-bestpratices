@@ -11,7 +11,8 @@ from .models import User, UserRole
 @api_view(['POST'])
 @require_json
 @validate_payload_fields([('email', 'Email missing'),
-                          ('password', 'Password missing')])
+                          ('password', 'Password missing'),
+                          ('phone_no', 'Phone number missing')])
 def signup(payload):
     """
     User signup

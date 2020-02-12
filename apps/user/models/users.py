@@ -1,5 +1,7 @@
 """ User Related Model """
 import enum
+import random
+import string
 
 from django.db import models
 
@@ -45,6 +47,11 @@ class User(BaseModel):
         :return: User object
         """
         return cls.objects.get(email=email)
+
+    @staticmethod
+    def generate_referral(size=8, chars=string.ascii_uppercase +
+                                           string.digits):
+        return ''.join(random.choice(chars) for n in range(size))
 
     class Meta:
         db_table = 'users'
