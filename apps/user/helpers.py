@@ -51,3 +51,21 @@ def generate_jwt(user_uuid):
 
     return dict(access_token=access_token,
                 refresh_token=refresh_token)
+
+
+def pagination(cls, page_number, limit):
+    """
+    Get pagination objects
+    :param cls: Class name - String
+    :param page_number: Integer
+    :param limit: Integer
+    :return: List of objects
+    """
+    if page_number and limit:
+        objs = User.objects.all() \
+            [(int(page_number) - 1) * int(limit):
+             int(page_number) * int(limit)]
+    else:
+        objs = User.objects.all()
+
+    return objs

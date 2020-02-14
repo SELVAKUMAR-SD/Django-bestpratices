@@ -48,9 +48,17 @@ class User(BaseModel):
         """
         return cls.objects.get(email=email)
 
+    @classmethod
+    def get_count(cls):
+        """
+        Get count of user
+        :return: Integer
+        """
+        pass
+
     @staticmethod
     def generate_referral(size=8, chars=string.ascii_uppercase +
-                                           string.digits):
+                                        string.digits):
         return ''.join(random.choice(chars) for n in range(size))
 
     class Meta:
