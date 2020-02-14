@@ -53,18 +53,24 @@ def generate_jwt(user_uuid):
                 refresh_token=refresh_token)
 
 
-def pagination(cls, page_number, limit):
+def pagination(page_number, limit, filter_params=None):
     """
     Get pagination objects
-    :param cls: Class name - String
     :param page_number: Integer
     :param limit: Integer
+    :param filter_params: String
     :return: List of objects
     """
-    if page_number and limit:
+    if page_number and limit and not filter_params:
         objs = User.objects.all() \
             [(int(page_number) - 1) * int(limit):
              int(page_number) * int(limit)]
+
+    elif page_number and limit and filter_params:
+        objs = User.objects.filter(first_name__contains=filter_params) \
+            [(int(page_number) - 1) * int(limit):
+             int(page_number) * int(limit)]
+
     else:
         objs = User.objects.all()
 

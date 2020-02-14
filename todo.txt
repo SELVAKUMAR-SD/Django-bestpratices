@@ -1,4 +1,4 @@
-pagination
+pagination, annotation for allowed params
 Redis
 Elastic search
 Testing

@@ -57,3 +57,15 @@ def validate_payload_fields(fields):
         return validate
 
     return decorator
+
+
+def allowed_params(func):
+    @wraps(func)
+    def decorator(request, *args, **kwargs):
+        filter_param = request.GET.get('password', None)
+        if filter_param:
+            if filter_param not in request.user_obj.__serialized_attributes__:
+                raise BadRequest('{msg} not allowed'.format(msg=filter_param))
+        return func(request, *args, **kwargs)
+
+    return decorator
