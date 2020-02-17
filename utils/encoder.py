@@ -1,5 +1,6 @@
 """ DjangoEncoder """
 import enum
+from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
@@ -15,6 +16,9 @@ class JSONEncoder(DjangoJSONEncoder):
         """ Encoding an obj to JSON """
         if isinstance(o, enum.Enum):
             return o.value
+
+        if isinstance(o, Decimal):
+            return float(o)
 
         if isinstance(o, APIError):
             return o.detail

@@ -1,11 +1,13 @@
 """ User API """
-import json
 
 from rest_framework.decorators import api_view
 
 from utils.auth import check_password
 from utils.json_response import JSONResponse
-from utils.utils import is_authorized_role, require_json, validate_payload_fields, allowed_params
+from utils.utils import (is_authorized_role,
+                         require_json,
+                         validate_payload_fields,
+                         allowed_query_params)
 from .helpers import create_user, generate_jwt, pagination
 from .models import User, UserRole
 
@@ -55,15 +57,14 @@ def details(request):
 
 
 @api_view(['GET'])
-@allowed_params
-def user_list(request):
+@allowed_query_params(['first_name'])
+def user_list(request, params):
     """
     Get all user with pagination
     :return: list of user objects
     """
     page = request.GET.get('page', None)
     limit = request.GET.get('limit', None)
-    filter_param = request.GET.get('first_name', None)
 
-    return JSONResponse(pagination(page, limit, filter_param),
+    return JSONResponse(pagination(page, limit, params),
                         json_key='users')

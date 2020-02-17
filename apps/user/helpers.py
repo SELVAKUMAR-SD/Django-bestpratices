@@ -61,13 +61,16 @@ def pagination(page_number, limit, filter_params=None):
     :param filter_params: String
     :return: List of objects
     """
+    print(filter_params)
     if page_number and limit and not filter_params:
+        print("not filter")
         objs = User.objects.all() \
             [(int(page_number) - 1) * int(limit):
              int(page_number) * int(limit)]
 
     elif page_number and limit and filter_params:
-        objs = User.objects.filter(first_name__contains=filter_params) \
+        print("Into filter")
+        objs = User.objects.filter(**filter_params) \
             [(int(page_number) - 1) * int(limit):
              int(page_number) * int(limit)]
 

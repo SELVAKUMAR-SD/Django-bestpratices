@@ -5,7 +5,7 @@ from functools import wraps
 from apps.user.models import UserRole
 from utils.errors import (BadRequest,
                           PermissionDenied,
-                          AuthenticationFailed)
+                          AuthenticationFailed, InvalidKeyError)
 
 
 def no_content_response():
@@ -59,13 +59,13 @@ def validate_payload_fields(fields):
     return decorator
 
 
-def allowed_params(func):
-    @wraps(func)
-    def decorator(request, *args, **kwargs):
-        filter_param = request.GET.get('password', None)
-        if filter_param:
-            if filter_param not in request.user_obj.__serialized_attributes__:
-                raise BadRequest('{msg} not allowed'.format(msg=filter_param))
-        return func(request, *args, **kwargs)
+def allowed_query_params(params):
+    def allowed_params(func):
+        @wraps(func)
+        def decorator(request, *args, **kwargs):
+            values = {key: request.GET[key] for key in params if key in request.GET}
+            return func(request, values, *args, **kwargs)
 
-    return decorator
+        return decorator
+
+    return allowed_params
