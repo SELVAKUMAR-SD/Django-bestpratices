@@ -1,7 +1,10 @@
 """ User API """
-
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from rest_framework import status
 from rest_framework.decorators import api_view
 
+from crud_samples import settings
 from utils.auth import check_password
 from utils.json_response import JSONResponse
 from utils.utils import (is_authorized_role,
@@ -10,6 +13,8 @@ from utils.utils import (is_authorized_role,
                          allowed_query_params)
 from .helpers import create_user, generate_jwt, pagination
 from .models import User, UserRole
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 @api_view(['POST'])
@@ -64,8 +69,18 @@ def user_list(request, params):
     Get all user with pagination
     :return: list of user objects
     """
-    page = request.GET.get('page', None)
-    limit = request.GET.get('limit', None)
-
-    return JSONResponse(pagination(page, limit, params),
-                        json_key='users')
+    if 'user' in cache:
+        print("Inside normal")
+        result = cache.get('user')
+        return JSONResponse(result, status=status.HTTP_201_CREATED)
+    else:
+        print("inside cache")
+        user = User.objects.all()
+        results = user
+        cache.set(user, results, timeout=CACHE_TTL)
+        return JSONResponse(results, status=status.HTTP_201_CREATED)
+    # page = request.GET.get('page', None)
+    # limit = request.GET.get('limit', None)
+    #
+    # return JSONResponse(pagination(page, limit, params),
+    #                     json_key='users')
