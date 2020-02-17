@@ -57,7 +57,8 @@ def details(request):
 
 
 @api_view(['GET'])
-@allowed_query_params(['first_name'])
+@allowed_query_params(['first_name',
+                       'uuid'])
 def user_list(request, params):
     """
     Get all user with pagination
