@@ -19,10 +19,10 @@ class User(BaseModel):
     """ User Model """
     __serialized_attributes__ = ('uuid', 'first_name', 'last_name',
                                  'email', 'phone_no', 'role',
-                                 'referral_code', 'referral')
+                                 'referral_code', 'referral', 'score')
     __updatable_attributes__ = ('first_name', 'last_name', 'email',
                                 'role', 'phone_no', 'referral_code',
-                                'referral')
+                                'referral', 'score')
 
     first_name = models.CharField(max_length=100, null=True)
     last_name = models.CharField(max_length=100, null=True)
@@ -30,6 +30,7 @@ class User(BaseModel):
     password_hash = models.CharField(max_length=256)
     phone_no = models.CharField(max_length=12)
     role = models.CharField(max_length=25)
+    score = models.FloatField(default=0)
     referral_code = models.CharField(max_length=15, unique=True,
                                      null=True)
     referral = models.ForeignKey('self', on_delete=models.CASCADE,

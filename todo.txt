@@ -1,5 +1,5 @@
 pagination, annotation for allowed params => Completed
-Redis => In progress
+Redis => Completed
 Elastic search
 Testing
 Background Tasks

@@ -82,3 +82,19 @@ def user_list(request, params):
 
     return JSONResponse(users, json_key='users',
                         status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@is_authorized_role((UserRole.CUSTOMER,))
+def update_score(request, payload):
+    """
+    update score
+    :param payload: dict
+    :return: user obj
+    """
+    user = request.user_obj
+    user.update(payload)
+    user.save()
+    users = User.objects.order_by('score')
+    cache.set('users', users, timeout=CACHE_TTL)
+    return JSONResponse(user, status=status.HTTP_200_OK)
