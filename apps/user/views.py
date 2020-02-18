@@ -69,18 +69,16 @@ def user_list(request, params):
     Get all user with pagination
     :return: list of user objects
     """
-    if 'user' in cache:
-        print("Inside normal")
-        result = cache.get('user')
-        return JSONResponse(result, status=status.HTTP_201_CREATED)
-    else:
-        print("inside cache")
-        user = User.objects.all()
-        results = user
-        cache.set(user, results, timeout=CACHE_TTL)
-        return JSONResponse(results, status=status.HTTP_201_CREATED)
-    # page = request.GET.get('page', None)
-    # limit = request.GET.get('limit', None)
-    #
-    # return JSONResponse(pagination(page, limit, params),
-    #                     json_key='users')
+    page = request.GET.get('page', None)
+    limit = request.GET.get('limit', None)
+
+    if 'users' in cache:
+        result = cache.get('users')
+        return JSONResponse(result, json_key='users',
+                            status=status.HTTP_201_CREATED)
+
+    users = pagination(page, limit, params)
+    cache.set('users', users, timeout=CACHE_TTL)
+
+    return JSONResponse(users, json_key='users',
+                        status=status.HTTP_201_CREATED)
