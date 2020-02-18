@@ -89,6 +89,7 @@ def user_list(request, params):
 def update_score(request, payload):
     """
     update score
+    :param request: Request
     :param payload: dict
     :return: user obj
     """
