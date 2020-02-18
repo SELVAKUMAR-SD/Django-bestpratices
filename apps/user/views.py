@@ -1,7 +1,10 @@
 """ User API """
-
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from rest_framework import status
 from rest_framework.decorators import api_view
 
+from crud_samples import settings
 from utils.auth import check_password
 from utils.json_response import JSONResponse
 from utils.utils import (is_authorized_role,
@@ -10,6 +13,8 @@ from utils.utils import (is_authorized_role,
                          allowed_query_params)
 from .helpers import create_user, generate_jwt, pagination
 from .models import User, UserRole
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 @api_view(['POST'])
@@ -67,5 +72,29 @@ def user_list(request, params):
     page = request.GET.get('page', None)
     limit = request.GET.get('limit', None)
 
-    return JSONResponse(pagination(page, limit, params),
-                        json_key='users')
+    if 'users' in cache:
+        result = cache.get('users')
+        return JSONResponse(result, json_key='users',
+                            status=status.HTTP_201_CREATED)
+
+    users = pagination(page, limit, params)
+    cache.set('users', users, timeout=CACHE_TTL)
+
+    return JSONResponse(users, json_key='users',
+                        status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@is_authorized_role((UserRole.CUSTOMER,))
+def update_score(request, payload):
+    """
+    update score
+    :param payload: dict
+    :return: user obj
+    """
+    user = request.user_obj
+    user.update(payload)
+    user.save()
+    users = User.objects.order_by('score')
+    cache.set('users', users, timeout=CACHE_TTL)
+    return JSONResponse(user, status=status.HTTP_200_OK)

@@ -27,7 +27,7 @@ def is_authorized_role(roles):
                 raise PermissionDenied('''User doesn't have
                  sufficient permissions to perform this operation''')
 
-            return function(request, *args, **kwargs)
+            return function(request, json.loads(request.body), *args, **kwargs)
 
         return wrap
 
@@ -63,7 +63,8 @@ def allowed_query_params(params):
     def allowed_params(func):
         @wraps(func)
         def decorator(request, *args, **kwargs):
-            values = {key: request.GET[key] for key in params if key in request.GET}
+            values = {key: request.GET[key]
+                      for key in params if key in request.GET}
             return func(request, values, *args, **kwargs)
 
         return decorator
